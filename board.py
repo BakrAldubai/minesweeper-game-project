@@ -1,95 +1,73 @@
-from  cell import  Cell
+from cell import Cell
 import random
-from colorama import Fore , Back
+from colorama import Fore, Back
+
+
 class Board:
     def __init__(self, dim_size, num_bombs):
         self.dim_size = dim_size
         self.num_bombs = num_bombs
-        self.board = self.make_new_board()      
+        self.board = self.make_board()
         self.assign_values_to_board()
 
-        # initialize a set to keep track of which locations we've uncovered
-        # we'll save (row,col) tuples into this set
         self.dug = set()
-        # if we dig at 0, 0, then self.dug = {(0,0)}
+        # if we dig at 10 , then self.dug = {10}
 
-    def make_new_board(self):
+    def make_board(self):
         # construct a new board based on the dim size and num bombs
-        # we should construct the list of lists here (or whatever representation you prefer,
-        # but since we have a 2-D board, list of lists is most natural)
+
 
         # generate a new board
-        board = [[None for _ in range(self.dim_size)] for _ in range(self.dim_size)]      
-        for r in range(self.dim_size) :
-            for c in range(self.dim_size) :
+        board = [[None for _ in range(self.dim_size)] for _ in range(self.dim_size)]
+        for r in range(self.dim_size):
+            for c in range(self.dim_size):
                 index = (r * self.dim_size) + c + 1
-                board[r][c] = Cell(index,self.dim_size)
-            
-            
+                board[r][c] = Cell(index, self.dim_size)
+
         bombs_planted = 0
         while bombs_planted < self.num_bombs:
             loc = random.randint(0, self.dim_size ** 2 - 1)
             # return a random integer N such that a <= N <= b
-            row = loc // self.dim_size  # we want the number of times dim_size goes into loc to tell us what row to look at
+            row = loc // self.dim_size # we want the number of times dim_size goes into loc to tell us what row to look at
             col = loc % self.dim_size  # we want the remainder to tell us what index in that row to look at
 
-            if board[row][col].bomb : 
+            if board[row][col].bomb:
                 # this means we've actually planted a bomb there already so keep going
                 continue
 
-            board[row][col].make_it_bomb()   # plant the bomb
+            board[row][col].make_it_bomb()  # plant the bomb
             bombs_planted += 1
 
         return board
-    
-    
-    def get_Board(self):
 
+    def get_Board(self):
 
         print()
         for r in range(self.dim_size):
             print(Back.BLACK, end='')
-            print(Fore.WHITE,'-------' * self.dim_size + '-')
+            print(Fore.WHITE, '-------' * self.dim_size + '-')
             print(Fore.WHITE, '|', end='')
             for c in range(self.dim_size):
-                if str(self.board[r][c]).startswith('-') :
+                if str(self.board[r][c]).startswith('-'):
                     print(Fore.GREEN, str(self.board[r][c]).strip('-'), Fore.WHITE, end='|')
                 elif '#' in str(self.board[r][c]):
-                    print(Back.RED, str(self.board[r][c]),Back.BLACK, Fore.WHITE, end='|')
+                    print(Back.RED, str(self.board[r][c]), Back.BLACK, Fore.WHITE, end='|')
                 else:
                     print(Fore.YELLOW, str(self.board[r][c]), Fore.WHITE, end='|')
             print()
-        print(Fore.WHITE,'-------' * self.dim_size + '-')
-
-        
+        print(Fore.WHITE, '-------' * self.dim_size + '-')
 
     def assign_values_to_board(self):
-        # now that we have the bombs planted, let's assign a number 0-8 for all the empty spaces, which
-        # represents how many neighboring bombs there are. we can precompute these and it'll save us some
-        # effort checking what's around the board later on :)
+
         for r in range(self.dim_size):
             for c in range(self.dim_size):
                 if self.board[r][c].bomb:
                     # if this is already a bomb, we don't want to calculate anything
                     continue
                 self.board[r][c].put_num_of_neighboring_bombs(self.get_num_neighboring_bombs(r, c))
-    # 
-    def get_num_neighboring_bombs(self, row, col):
-        # let's iterate through each of the neighboring positions and sum number of bombs
-        # top left: (row-1, col-1)
-        # top middle: (row-1, col)
-        # top right: (row-1, col+1)
-        # left: (row, col-1)
-        # right: (row, col+1)
-        # bottom left: (row+1, col-1)
-        # bottom middle: (row+1, col)
-        # bottom right: (row+1, col+1)
 
-        # make sure to not go out of bounds!
-        # (0,0)-(0,1)-(0,2)-(0,3)
-        # (1,0)-(1,1)-(1,2)-(1,3)
-        # (2,0)-(2,1)-(2,2)-(2,3)
-        # (3,0)-(3,1)-(3,2)-(3,3)
+    def get_num_neighboring_bombs(self, row, col):
+
 
         num_neighboring_bombs = 0
         for r in range(max(0, row - 1), min(self.dim_size - 1, row + 1) + 1):
@@ -103,11 +81,22 @@ class Board:
 
         return num_neighboring_bombs
 
-    def reveal_all(self): # reveal all cells in the board
+    def reveal_all(self):  # reveal all cells in the board
         for r in range(self.dim_size):
             for c in range(self.dim_size):
                 if self.board[r][c].bomb:
                     self.board[r][c].visable = True
+
+
+
+
+
+
+
+
+
+
+
 
 
 
